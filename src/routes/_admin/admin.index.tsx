@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useAdminStore } from "@/store/admin-store";
 import { useContentStore } from "@/store/content-store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_admin/admin/")({
@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_admin/admin/")({
   component: AdminDashboard,
 });
 
-type Tab = "overview" | "profile" | "skills" | "projects";
+type Tab = "overview" | "profile" | "skills" | "projects" | "messages";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -53,7 +53,7 @@ function AdminDashboard() {
         </div>
 
         <nav className="mt-12 flex flex-wrap gap-2 border-b border-border/60 pb-2">
-          {(["overview", "profile", "skills", "projects"] as Tab[]).map((t) => (
+          {(["overview", "profile", "skills", "projects", "messages"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -71,6 +71,7 @@ function AdminDashboard() {
           {tab === "profile" && <ProfileEditor />}
           {tab === "skills" && <SkillsEditor />}
           {tab === "projects" && <ProjectsEditor />}
+          {tab === "messages" && <MessagesViewer />}
         </div>
       </main>
     </div>
@@ -249,6 +250,68 @@ function ProjectsEditor() {
       >
         + Add project
       </button>
+    </div>
+  );
+}
+
+function MessagesViewer() {
+  const [messages, setMessages] = useState<Array<{ id: number; name: string; email: string; message: string; created_at: string }>>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetch("/api/admin/messages")
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Unable to load messages.");
+        }
+        const data = await response.json();
+        if (mounted) {
+          setMessages(data.messages ?? []);
+        }
+      })
+      .catch((err) => {
+        if (mounted) setError(err.message || "Unable to load messages.");
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 border border-border p-6">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Contact submissions</p>
+          <p className="font-display text-3xl mt-2">Message inbox</p>
+        </div>
+        <p className="text-sm text-muted-foreground">{messages.length} message{messages.length === 1 ? "" : "s"}</p>
+      </div>
+
+      {loading && <div className="border border-border p-6 text-sm text-muted-foreground">Loading messages…</div>}
+      {error && <div className="border border-destructive/20 bg-destructive/5 p-6 text-sm text-destructive">{error}</div>}
+      {!loading && !error && messages.length === 0 && (
+        <div className="border border-border p-6 text-sm text-muted-foreground">No messages yet.</div>
+      )}
+
+      <div className="space-y-4">
+        {messages.map((message) => (
+          <div key={message.id} className="border border-border p-6 rounded-md">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="font-semibold">{message.name}</p>
+                <a href={`mailto:${message.email}`} className="text-sm text-primary underline-offset-2 hover:underline">{message.email}</a>
+              </div>
+              <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground">{new Date(message.created_at).toLocaleString()}</p>
+            </div>
+            <p className="mt-4 whitespace-pre-line text-sm leading-relaxed">{message.message}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PageShell } from "@/components/page-shell";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { useContentStore } from "@/store/content-store";
@@ -27,9 +27,10 @@ function ContactPage() {
   const profile = useContentStore((s) => s.profile);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = schema.safeParse(form);
     if (!result.success) {
@@ -40,13 +41,30 @@ function ContactPage() {
       setErrors(errs);
       return;
     }
+
     setErrors({});
+    setSubmitError(null);
     setSubmitting(true);
-    setTimeout(() => {
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(result.data),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        setSubmitError(payload?.message ?? "Unable to submit the form.");
+      } else {
+        setForm({ name: "", email: "", message: "" });
+        toast.success("Thanks — I'll be in touch soon.");
+      }
+    } catch (error) {
+      setSubmitError("Unable to submit. Please try again later.");
+    } finally {
       setSubmitting(false);
-      setForm({ name: "", email: "", message: "" });
-      toast.success("Thanks — I'll be in touch soon.");
-    }, 600);
+    }
   };
 
   return (
@@ -85,8 +103,9 @@ function ContactPage() {
             {submitting ? "Sending…" : "Send message"}
             <span className="transition-transform group-hover:translate-x-1">→</span>
           </button>
+          {submitError && <p className="text-xs text-destructive">{submitError}</p>}
           <p className="text-[10px] uppercase tracking-[0.2em] opacity-50">
-            Form is local — not stored or emailed yet. Enable Lovable Cloud or Resend to wire delivery.
+            {/* Form is local — not stored or emailed yet. Enable Lovable Cloud or Resend to wire delivery. */}
           </p>
         </form>
 
