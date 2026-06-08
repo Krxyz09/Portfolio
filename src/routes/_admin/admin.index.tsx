@@ -261,7 +261,8 @@ function MessagesViewer() {
 
   useEffect(() => {
     let mounted = true;
-    fetch("/api/admin/messages")
+    const API_BASE = (import.meta.env.VITE_API_BASE as string) || "";
+    fetch(`${API_BASE}/api/admin/messages`)
       .then(async (response) => {
         if (!response.ok) {
           throw new Error("Unable to load messages.");

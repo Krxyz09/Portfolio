@@ -21,7 +21,7 @@ export function PageShell({
     >
       <div className="mx-auto max-w-7xl px-6 pt-20 pb-16 md:px-10 md:pt-32 md:pb-24">
         <div className="flex items-start justify-between text-[10px] uppercase tracking-[0.3em] opacity-60">
-          <span>{eyebrow ?? "—"}</span>
+          {eyebrow ? <span>{eyebrow}</span> : <span />}
           <span className="font-display text-base opacity-70">✶</span>
         </div>
         <motion.h1

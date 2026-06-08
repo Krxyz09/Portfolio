@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_site/projects/")({
 function ProjectsPage() {
   const projects = useContentStore((s) => s.projects);
   return (
-    <PageShell eyebrow="(work) — selected projects" title="work" subtitle={`${projects.length}`}>
+    <PageShell title="work" subtitle={`${projects.length}`}>
       <ul className="divide-y divide-border/60 border-y border-border/60">
         {projects.map((p, i) => (
           <motion.li

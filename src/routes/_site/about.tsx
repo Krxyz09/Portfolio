@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_site/about")({
 function AboutPage() {
   const profile = useContentStore((s) => s.profile);
   return (
-    <PageShell eyebrow="(about) — the story" title="about" subtitle="krish" tone="cream">
+    <PageShell title="about" subtitle="krish" tone="cream">
       <div className="grid gap-12 md:grid-cols-12">
         <div className="md:col-span-7 space-y-6 text-lg md:text-xl leading-relaxed">
           {profile.bio.map((p, i) => (

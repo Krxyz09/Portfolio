@@ -7,7 +7,7 @@
  */
 export const ADMIN_CREDENTIALS = {
   email: "jindalkrish25@gmail.com",
-  password: "Password7777",
+  password: "Krish@7594",
 } as const;
 
 export const ADMIN_SESSION_KEY = "admin_session_v1";

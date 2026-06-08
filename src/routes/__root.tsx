@@ -75,17 +75,62 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
-      { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Krish Jindal — Portfolio" },
-      { name: "description", content: "Portfolio of Krish Jindal — software engineer and product builder." },
-      { name: "author", content: "Krish Jindal" },
-      { property: "og:title", content: "Krish Jindal — Portfolio" },
-      { property: "og:description", content: "Portfolio of Krish Jindal — software engineer and product builder." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+{ charSet: "utf-8" },
+{ name: "viewport", content: "width=device-width, initial-scale=1" },
+
+{ title: "Krish Jindal | Full-Stack Developer & Machine Learning Engineer" },
+
+{
+name: "description",
+content:
+"Portfolio of Krish Jindal — Full-Stack Developer and Machine Learning Engineer building scalable web applications, intelligent systems, and data-driven solutions."
+},
+
+{ name: "author", content: "Krish Jindal" },
+
+{
+name: "keywords",
+content:
+"Krish Jindal, Full Stack Developer, Machine Learning Engineer, React, Node.js, Python, MongoDB, PostgreSQL, Redis, Docker, Software Engineer Portfolio"
+},
+
+{ name: "theme-color", content: "#000000" },
+
+{
+property: "og:title",
+content: "Krish Jindal | Full-Stack Developer & Machine Learning Engineer"
+},
+
+{
+property: "og:description",
+content:
+"Explore projects in Full-Stack Development, Machine Learning, Backend Systems, and Modern Web Technologies."
+},
+
+{ property: "og:type", content: "website" },
+{ property: "og:url", content: "https://krishjindal.com" },
+{ property: "og:image", content: "/og-image.png" },
+
+{ name: "twitter:card", content: "summary_large_image" },
+
+{
+name: "twitter:title",
+content: "Krish Jindal | Full-Stack Developer & Machine Learning Engineer"
+},
+
+{
+name: "twitter:description",
+content:
+"Portfolio showcasing software engineering, machine learning, and full-stack development projects."
+},
+
+{ name: "twitter:image", content: "/og-image.png" },
+
     ],
     links: [
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "shortcut icon", href: "/favicon.ico", type: "image/x-icon" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

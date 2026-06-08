@@ -13,6 +13,7 @@ export const defaultSkills: SkillGroup[] = [
       "Tailwind CSS",
       "HTML",
       "CSS",
+      "TypeScript",
     ],
   },
   {
@@ -50,9 +51,7 @@ export const defaultSkills: SkillGroup[] = [
       "Nginx",
       "Git",
       "GitHub",
-      "Streamlit",
-      "Google Colab",
-      "Jupyter Notebook",
+
     ],
   },
 ];

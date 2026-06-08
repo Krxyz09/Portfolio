@@ -47,7 +47,8 @@ function ContactPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("/api/contact", {
+      const API_BASE = (import.meta.env.VITE_API_BASE as string) || "";
+      const response = await fetch(`${API_BASE}/api/contact`, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(result.data),
@@ -58,7 +59,7 @@ function ContactPage() {
         setSubmitError(payload?.message ?? "Unable to submit the form.");
       } else {
         setForm({ name: "", email: "", message: "" });
-        toast.success("Thanks — I'll be in touch soon.");
+        toast.success("Thanks — Krish will be in touch soon.");
       }
     } catch (error) {
       setSubmitError("Unable to submit. Please try again later.");
@@ -68,7 +69,7 @@ function ContactPage() {
   };
 
   return (
-    <PageShell eyebrow="(contact) — say hello" title="hello" subtitle="say hi" tone="cream">
+    <PageShell title="hello" subtitle="say hi" tone="cream">
       <div className="grid gap-12 md:grid-cols-12">
         <form onSubmit={onSubmit} className="md:col-span-7 space-y-8">
           {(["name", "email"] as const).map((field) => (

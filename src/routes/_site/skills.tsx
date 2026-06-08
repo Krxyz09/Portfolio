@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_site/skills")({
 function SkillsPage() {
   const skills = useContentStore((s) => s.skills);
   return (
-    <PageShell eyebrow="(skills) — the toolkit" title="skills" subtitle="toolkit">
+    <PageShell title="skills" subtitle="toolkit">
       <div className="divide-y divide-border/60 border-y border-border/60">
         {skills.map((group, i) => (
           <motion.div
