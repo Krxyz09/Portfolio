@@ -1,5 +1,4 @@
 import "./lib/error-capture";
-import 'dotenv/config';
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 import { z } from "zod";
