@@ -48,37 +48,3 @@ This portfolio serves as a central place to showcase my development work, share 
 Feel free to explore the projects, reach out, or connect with me to discuss software engineering, web development, and technology.
 
 ## Deployment (Frontend on Vercel, Backend on Render)
-
-Recommended quick setup:
-
-1. Backend (Render)
-	- Deploy the `backend/` folder as a web service on Render (or any host with persistent storage).
-	- Set environment variables on Render: `SQLITE_DB_PATH` (optional) and `PORT` (optional).
-	- Start command: `npm start` (the project includes `backend/server.js`).
-
-2. Frontend (Vercel)
-	- Deploy the repo root on Vercel, using the existing Vite project.
-	- In Vercel project settings, add an Environment Variable `VITE_API_BASE` with the full URL of your deployed backend (for example `https://your-backend.onrender.com`).
-	- Build command: `npm run build` (Vite) and output directory as `dist`.
-
-3. Local testing
-	- Run backend locally:
-```bash
-cd backend
-npm install
-npm start
-```
-
-	- Run frontend locally and point to the backend:
-```bash
-cd C:\Project\Portfolio
-cp .env.example .env
-# edit VITE_API_BASE in .env to http://localhost:3001
-npm install
-npm run dev
-```
-
-Notes:
-- The frontend uses `import.meta.env.VITE_API_BASE` (set in Vercel) to call the backend API. If empty, it will call same-origin.
-- SQLite is fine for local and for the backend if you host it on Render/VPS. Do not use SQLite with Vercel serverless functions.
-
