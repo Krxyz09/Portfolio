@@ -1,22 +1,21 @@
-import path from "path";
-import fs from "fs";
-import sqlite3 from "sqlite3";
-import { open, Database } from "sqlite";
+import { createClient, Client } from "@libsql/client";
 
-let db: Database | undefined;
+let client: Client | undefined;
 
-function getDbPath(): string {
-  // allow override with env var, default to ./data/portfolio_contact_db.sqlite
-  return process.env.SQLITE_DB_PATH ?? path.join(process.cwd(), "data", "portfolio_contact_db.sqlite");
-}
+function getDbClient(): Client {
+  if (client) return client;
 
-async function getDb(): Promise<Database> {
-  if (db) return db;
-  const dbPath = getDbPath();
-  await fs.promises.mkdir(path.dirname(dbPath), { recursive: true });
-  db = await open({ filename: dbPath, driver: sqlite3.Database });
+  // Initialize Turso Client using your cloud environment variables
+  if (!process.env.TURSO_DATABASE_URL) {
+    throw new Error("TURSO_DATABASE_URL is not defined in the environment variables.");
+  }
 
-  await db.exec(`
+  client = createClient({
+    url: process.env.TURSO_DATABASE_URL,
+    authToken: process.env.TURSO_AUTH_TOKEN, 
+  });
+
+  client.execute(`
     CREATE TABLE IF NOT EXISTS contact_messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -24,9 +23,11 @@ async function getDb(): Promise<Database> {
       message TEXT NOT NULL,
       created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
-  `);
+  `).catch((err) => {
+    console.error("Failed to initialize Turso database table:", err);
+  });
 
-  return db;
+  return client;
 }
 
 export type ContactSubmission = {
@@ -36,13 +37,13 @@ export type ContactSubmission = {
 };
 
 export async function saveContactSubmission(submission: ContactSubmission) {
-  const database = await getDb();
-  await database.run(
-    `INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)`,
-    submission.name,
-    submission.email,
-    submission.message,
-  );
+  const dbClient = getDbClient();
+  
+  // Turso uses .execute() with positional parameters passed in an 'args' array
+  await dbClient.execute({
+    sql: `INSERT INTO contact_messages (name, email, message) VALUES (?, ?, ?)`,
+    args: [submission.name, submission.email, submission.message],
+  });
 }
 
 export type ContactMessage = {
@@ -54,16 +55,15 @@ export type ContactMessage = {
 };
 
 export async function getContactMessages(): Promise<ContactMessage[]> {
-  const database = await getDb();
-  const rows = await database.all<{
-    id: number;
-    name: string;
-    email: string;
-    message: string;
-    created_at: string;
-  }>(`SELECT id, name, email, message, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 100`);
+  const dbClient = getDbClient();
+  
+  // Fetch data using Turso's standard .execute method
+  const result = await dbClient.execute(
+    `SELECT id, name, email, message, created_at FROM contact_messages ORDER BY created_at DESC LIMIT 100`
+  );
 
-  return rows.map((row) => ({
+  // Turso returns results in a clean array of objects under .rows
+  return result.rows.map((row) => ({
     id: Number(row.id),
     name: String(row.name),
     email: String(row.email),

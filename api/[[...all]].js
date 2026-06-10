@@ -1,4 +1,5 @@
 const { Readable } = require("stream");
+const path = require("path"); // Added for reliable absolute path resolution
 
 async function toWebRequest(req) {
   const proto = req.headers["x-forwarded-proto"] || "https";
@@ -20,23 +21,31 @@ async function toWebRequest(req) {
     method: req.method,
     headers,
     body,
+    // Add duplex option; required in modern Node versions when passing a stream as a body
+    ...(body ? { duplex: "half" } : {}), 
   });
 }
 
 async function pipeWebResponse(res, response) {
   res.statusCode = response.status;
   for (const [k, v] of response.headers.entries()) {
-    // Node allows setting multiple headers; use setHeader
     res.setHeader(k, v);
   }
-  const buffer = Buffer.from(await response.arrayBuffer());
-  res.end(buffer);
+  
+  // Optimization: Stream the response body instead of consuming it entirely into memory
+  if (response.body) {
+    const readable = Readable.fromWeb(response.body);
+    readable.pipe(res);
+  } else {
+    res.end();
+  }
 }
 
 module.exports = async (req, res) => {
   try {
-    // import the built server bundle
-    const serverModule = await import(`${process.cwd()}/dist/server/server.js`);
+    // Standardized relative path resolution using path.resolve
+    const serverBundlePath = path.resolve(process.cwd(), "dist/server/server.js");
+    const serverModule = await import(serverBundlePath);
     const server = serverModule.default ?? serverModule;
 
     const webReq = await toWebRequest(req);
